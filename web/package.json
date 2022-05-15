@@ -20,7 +20,7 @@
     "postcss": "^8.4.13",
     "postcss-load-config": "^3.1.4",
     "svelte": "^3.48.0",
-    "svelte-check": "^2.7.0",
+    "svelte-check": "^2.7.1",
     "svelte-preprocess": "^4.10.6",
     "tailwindcss": "^3.0.24",
     "typescript": "~4.6.4"
@@ -29,8 +29,11 @@
   "dependencies": {
     "@apollo/client": "^3.6.2",
     "@pinata/sdk": "^1.1.25",
+    "@urql/svelte": "^1.3.3",
     "dotenv": "^16.0.1",
     "ethers": "^5.6.6",
+    "graphql": "^15.8.0",
+    "react": "^18.1.0",
     "slugify": "^1.6.5",
     "svelte-ethers-store": "^2.3.1"
   }

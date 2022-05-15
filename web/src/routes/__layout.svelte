@@ -2,9 +2,17 @@
   import "../app.css";
   import { init } from "$lib/web3.js";
 
-  import { connected, chainId } from 'svelte-ethers-store'
+  import loadContracts from '$lib/contractload.js';
+
+  import { connected, chainId, signerAddress } from 'svelte-ethers-store'
   import { onMount } from 'svelte';
 
+
+	$: if($signerAddress) {
+    try {
+      loadContracts();
+    } catch(e) {}
+  }
 
   onMount(() => {
     init();
