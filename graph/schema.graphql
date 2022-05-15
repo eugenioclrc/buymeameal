@@ -3,7 +3,6 @@ type ProfileEntity @entity {
   username: String!
   avatar: String
   color: String
-  textColor: String
   backgroundimg: String
   bio: String
   createdAtTimestamp: BigInt!
