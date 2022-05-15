@@ -162,6 +162,40 @@ export class ProfileEntity extends Entity {
   set owner(value: string) {
     this.set("owner", Value.fromString(value));
   }
+
+  get balance(): BigInt | null {
+    let value = this.get("balance");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set balance(value: BigInt | null) {
+    if (!value) {
+      this.unset("balance");
+    } else {
+      this.set("balance", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get totalGain(): BigInt | null {
+    let value = this.get("totalGain");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set totalGain(value: BigInt | null) {
+    if (!value) {
+      this.unset("totalGain");
+    } else {
+      this.set("totalGain", Value.fromBigInt(<BigInt>value));
+    }
+  }
 }
 
 export class User extends Entity {

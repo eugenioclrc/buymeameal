@@ -141,8 +141,21 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
 export function handleProfileSetup(event: ProfileSetup): void {}
 
-export function handleTotalGain(event: TotalGain): void {}
+export function handleTotalGain(event: TotalGain): void {
+  let entity = ProfileEntity.load(event.params.tokenId.toString());
+  if (entity) {
+    let contract = ProfileBuyMeAMealContract.bind(event.address);
+    entity.totalGain = contract.tokenTotalGain(event.params.tokenId);
+    entity.save();
+  }
+}
 
 export function handleUpdateMinDeposit(event: UpdateMinDeposit): void {}
 
-export function handleWithdraw(event: Withdraw): void {}
+export function handleWithdraw(event: Withdraw): void {
+  let entity = ProfileEntity.load(event.params.tokenId.toString());
+  if (entity) {
+    entity.balance = new BigInt(0);
+    entity.save();
+  }
+}

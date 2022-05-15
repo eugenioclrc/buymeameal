@@ -9,6 +9,8 @@ type ProfileEntity @entity {
   createdAtTimestamp: BigInt!
   creator: User!
   owner: User!
+  balance: BigInt
+  totalGain: BigInt
 }
 
 type User @entity {
