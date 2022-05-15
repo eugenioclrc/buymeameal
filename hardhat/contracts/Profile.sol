@@ -60,14 +60,15 @@ contract ProfileBuyMeAMeal is ERC721, Ownable, Multicall {
         emit UpdateMinDeposit(_amount);
     }
 
-    function safeMint(bytes32 _username, string memory uri, bytes calldata _signature) external {
+    function safeMint(bytes32 _username,  address to, bytes calldata _signature) external {
         require(usernameToTokenId[_username] == 0, "Username is registered");
+        require(to == msg.sender, "Sorry flash boy");
 
         bytes32 signatureMsg = keccak256(
             abi.encodePacked(
                 address(this),
-                _username,
-                uri
+                to,
+                _username
             )
         );
 
