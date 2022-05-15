@@ -1,0 +1,10 @@
+type ProfileEntity @entity {
+  id: ID!
+  username: String!
+  owner: String! # address
+  avatar: String
+  color: String
+  textColor: String
+  backgroundimg: String
+  bio: String
+}

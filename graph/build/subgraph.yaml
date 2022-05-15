@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: ProfileBuyMeAMeal
@@ -27,7 +27,7 @@ dataSources:
         - Withdraw
       abis:
         - name: ProfileBuyMeAMeal
-          file: ./abis/ProfileBuyMeAMeal.json
+          file: ProfileBuyMeAMeal/abis/ProfileBuyMeAMeal.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval
@@ -51,4 +51,4 @@ dataSources:
           handler: handleUpdateMinDeposit
         - event: Withdraw(indexed uint256,address,uint256)
           handler: handleWithdraw
-      file: ./src/mapping.ts
+      file: ProfileBuyMeAMeal/ProfileBuyMeAMeal.wasm

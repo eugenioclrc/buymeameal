@@ -1,5 +1,5 @@
 import { BigInt, ipfs } from "@graphprotocol/graph-ts"
-import ethers from 'ethers';
+// import {ethers} from 'ethers';
 import {
   ProfileBuyMeAMeal as ProfileBuyMeAMealContract,
   Approval,
@@ -16,26 +16,43 @@ import {
 } from "../generated/ProfileBuyMeAMeal/ProfileBuyMeAMeal"
 import { ProfileEntity } from "../generated/schema"
 
-function rndColor() {
-  const colors = ['264653','023047','d90429','2b2d42','001219','000000','231942','e85d04','2f3e46','b5179e','f72585','f95738','ff206e','132a13'];
-  return colors[Math.floor(Math.random() * colors.length)];
-}
 
 export function handleTransfer(event: TransferEvent): void {
+  
+
   let entity = ProfileEntity.load(event.params.tokenId.toString());
   if (!entity) {
     entity = new ProfileEntity(event.transaction.from.toHex())
     entity.id = event.params.tokenId.toString()
     let contract = ProfileBuyMeAMealContract.bind(event.address);
-    entity.color = rndColor();
+    entity.color = '001219';
     entity.textColor = 'FFFFFF';
-    entity.username = ethers.utils.parseBytes32String(await contract.tokenIdUsername(event.params.tokenId));
+    entity.username = contract.bytes32ToString(contract.tokenIdUsername(event.params.tokenId));
     entity.avatar = '';
     entity.backgroundimg = '';
     entity.bio = '';
   }
   entity.owner = event.params.to.toHexString();
   entity.save();
+}
+
+export function handleUpdate(event: Update): void {
+  let entity = ProfileEntity.load(event.params.tokenId.toString());
+  if (entity) {
+    if(event.params.key == 'color') {
+      entity.color = event.params.data;
+    } else if(event.params.key == 'textColor') {
+      entity.textColor = event.params.data;
+    } else if(event.params.key == 'username') {
+      entity.username = event.params.data;
+    } else if(event.params.key == 'avatar') {
+      entity.avatar = event.params.data;
+    } else if(event.params.key == 'backgroundimg') {
+      entity.backgroundimg = event.params.data;
+    } else if(event.params.key == 'bio') {
+      entity.bio = event.params.data;
+    }
+  }
 }
 
 /*
@@ -109,9 +126,6 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 export function handleProfileSetup(event: ProfileSetup): void {}
 
 export function handleTotalGain(event: TotalGain): void {}
-
-
-export function handleUpdate(event: Update): void {}
 
 export function handleUpdateMinDeposit(event: UpdateMinDeposit): void {}
 
