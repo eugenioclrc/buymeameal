@@ -73,13 +73,13 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "donator",
         "type": "address"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
@@ -89,9 +89,21 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "twitter",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "msg",
+        "type": "string"
       }
     ],
-    "name": "Gain",
+    "name": "Donate",
     "type": "event"
   },
   {
@@ -111,6 +123,25 @@
       }
     ],
     "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "username",
+        "type": "string"
+      }
+    ],
+    "name": "ProfileSetup",
     "type": "event"
   },
   {
@@ -206,25 +237,6 @@
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "url",
-        "type": "string"
-      }
-    ],
-    "name": "UpdateProfile",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "owner",
         "type": "address"
@@ -261,11 +273,28 @@
   {
     "inputs": [
       { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "bytes32", "name": "", "type": "bytes32" }
+      { "internalType": "bytes32", "name": "_from", "type": "bytes32" },
+      { "internalType": "string", "name": "_msg", "type": "string" }
     ],
     "name": "buyMeal",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_bytes32", "type": "bytes32" }
+    ],
+    "name": "bytes32ToString",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "contractURI",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -302,6 +331,17 @@
     "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "bytes[]", "name": "data", "type": "bytes[]" }
+    ],
+    "name": "multicall",
+    "outputs": [
+      { "internalType": "bytes[]", "name": "results", "type": "bytes[]" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "name",
     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
@@ -334,7 +374,7 @@
   {
     "inputs": [
       { "internalType": "bytes32", "name": "_username", "type": "bytes32" },
-      { "internalType": "string", "name": "uri", "type": "string" },
+      { "internalType": "address", "name": "to", "type": "address" },
       { "internalType": "bytes", "name": "_signature", "type": "bytes" }
     ],
     "name": "safeMint",
@@ -392,19 +432,22 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "bytes32", "name": "_username", "type": "bytes32" }
-    ],
-    "name": "tokenID",
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "tokenIdToBalance",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
-    ],
-    "name": "tokenTVL",
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "tokenIdUsername",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "tokenTotalGain",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
@@ -451,6 +494,15 @@
   },
   {
     "inputs": [
+      { "internalType": "string", "name": "_contractURI", "type": "string" }
+    ],
+    "name": "updateContractURI",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "uint256", "name": "_amount", "type": "uint256" }
     ],
     "name": "updateMinDeposit",
@@ -468,13 +520,10 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "string", "name": "ipfsUrl", "type": "string" }
-    ],
-    "name": "updateProfile",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "usernameToTokenId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {

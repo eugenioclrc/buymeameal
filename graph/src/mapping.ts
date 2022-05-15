@@ -1,46 +1,44 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigInt, ipfs } from "@graphprotocol/graph-ts"
+import ethers from 'ethers';
 import {
-  ProfileBuyMeAMeal,
+  ProfileBuyMeAMeal as ProfileBuyMeAMealContract,
   Approval,
   ApprovalForAll,
   ChangeMinter,
-  Gain,
+  Donate,
   OwnershipTransferred,
+  ProfileSetup,
   TotalGain,
-  Transfer,
+  Transfer as TransferEvent,
   Update,
   UpdateMinDeposit,
-  UpdateProfile,
   Withdraw
 } from "../generated/ProfileBuyMeAMeal/ProfileBuyMeAMeal"
-import { ExampleEntity, ProfileBuyMeAMeal } from "../generated/schema"
+import { ProfileEntity } from "../generated/schema"
 
-
-export function handleTransfer(event: Transfer): void {
-  let token = ProfileBuyMeAMeal.load(event.params.tokenId.toString());
-  if (!token) {
-    token = new ProfileBuyMeAMeal(event.params.tokenId.toString());
-    // token.creator = event.params.to.toHexString();
-    // token.tokenID = event.params.tokenId;
-  
-    // let tokenContract = TokenContract.bind(event.address);
-    // token.contentURI = tokenContract.tokenURI(event.params.tokenId);
-    // token.tokenIPFSPath = tokenContract.getTokenIPFSPath(event.params.tokenId);
-    // token.name = tokenContract.name();
-    // token.createdAtTimestamp = event.block.timestamp;
-  }
-  // token.owner = event.params.to.toHexString();
-  token.save();
-  
-  /*
-  let user = User.load(event.params.to.toHexString());
-  if (!user) {
-    user = new User(event.params.to.toHexString());
-    user.save();
-  }
-  */
+function rndColor() {
+  const colors = ['264653','023047','d90429','2b2d42','001219','000000','231942','e85d04','2f3e46','b5179e','f72585','f95738','ff206e','132a13'];
+  return colors[Math.floor(Math.random() * colors.length)];
 }
 
+export function handleTransfer(event: TransferEvent): void {
+  let entity = ProfileEntity.load(event.params.tokenId.toString());
+  if (!entity) {
+    entity = new ProfileEntity(event.transaction.from.toHex())
+    entity.id = event.params.tokenId.toString()
+    let contract = ProfileBuyMeAMealContract.bind(event.address);
+    entity.color = rndColor();
+    entity.textColor = 'FFFFFF';
+    entity.username = ethers.utils.parseBytes32String(await contract.tokenIdUsername(event.params.tokenId));
+    entity.avatar = '';
+    entity.backgroundimg = '';
+    entity.bio = '';
+  }
+  entity.owner = event.params.to.toHexString();
+  entity.save();
+}
+
+/*
 export function handleApproval(event: Approval): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
@@ -81,34 +79,40 @@ export function handleApproval(event: Approval): void {
   // state variables and other data:
   //
   // - contract.balanceOf(...)
+  // - contract.bytes32ToString(...)
+  // - contract.contractURI(...)
   // - contract.getApproved(...)
   // - contract.isApprovedForAll(...)
   // - contract.minDeposit(...)
   // - contract.minter(...)
+  // - contract.multicall(...)
   // - contract.name(...)
   // - contract.owner(...)
   // - contract.ownerOf(...)
   // - contract.supportsInterface(...)
   // - contract.symbol(...)
-  // - contract.tokenID(...)
-  // - contract.tokenTVL(...)
+  // - contract.tokenIdToBalance(...)
+  // - contract.tokenIdUsername(...)
+  // - contract.tokenTotalGain(...)
   // - contract.tokenURI(...)
+  // - contract.usernameToTokenId(...)
 }
-
+*/
 export function handleApprovalForAll(event: ApprovalForAll): void {}
 
 export function handleChangeMinter(event: ChangeMinter): void {}
 
-export function handleGain(event: Gain): void {}
+export function handleDonate(event: Donate): void {}
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
+export function handleProfileSetup(event: ProfileSetup): void {}
+
 export function handleTotalGain(event: TotalGain): void {}
+
 
 export function handleUpdate(event: Update): void {}
 
 export function handleUpdateMinDeposit(event: UpdateMinDeposit): void {}
-
-export function handleUpdateProfile(event: UpdateProfile): void {}
 
 export function handleWithdraw(event: Withdraw): void {}

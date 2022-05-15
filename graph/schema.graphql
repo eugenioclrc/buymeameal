@@ -1,10 +1,10 @@
-type ExampleEntity @entity {
+type ProfileEntity @entity {
   id: ID!
-  count: BigInt!
-  owner: Bytes! # address
-  approved: Bytes! # address
-}
-
-type ProfileBuyMeAMeal @entity {
-  id: ID!
+  username: String!
+  owner: String! # address
+  avatar: String
+  color: String
+  textColor: String
+  backgroundimg: String
+  bio: String
 }

@@ -6,7 +6,7 @@ dataSources:
     name: ProfileBuyMeAMeal
     network: mumbai
     source:
-      address: "0x7EcB084799D232254295cA3ceC16e722b4282678"
+      address: "0x4C0407dA3274217214b7De79F6EB982095969A0e"
       abi: ProfileBuyMeAMeal
     mapping:
       kind: ethereum/events
@@ -16,13 +16,13 @@ dataSources:
         - Approval
         - ApprovalForAll
         - ChangeMinter
-        - Gain
+        - Donate
         - OwnershipTransferred
+        - ProfileSetup
         - TotalGain
         - Transfer
         - Update
         - UpdateMinDeposit
-        - UpdateProfile
         - Withdraw
       abis:
         - name: ProfileBuyMeAMeal
@@ -34,10 +34,12 @@ dataSources:
           handler: handleApprovalForAll
         - event: ChangeMinter(indexed address,indexed address)
           handler: handleChangeMinter
-        - event: Gain(address,uint256,uint256)
-          handler: handleGain
+        - event: Donate(indexed address,indexed uint256,uint256,bytes32,string)
+          handler: handleDonate
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
+        - event: ProfileSetup(indexed uint256,string)
+          handler: handleProfileSetup
         - event: TotalGain(indexed uint256,uint256)
           handler: handleTotalGain
         - event: Transfer(indexed address,indexed address,indexed uint256)
@@ -46,8 +48,6 @@ dataSources:
           handler: handleUpdate
         - event: UpdateMinDeposit(uint256)
           handler: handleUpdateMinDeposit
-        - event: UpdateProfile(indexed uint256,string)
-          handler: handleUpdateProfile
         - event: Withdraw(indexed uint256,address,uint256)
           handler: handleWithdraw
       file: ./src/mapping.ts

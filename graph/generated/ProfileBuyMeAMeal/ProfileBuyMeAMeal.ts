@@ -84,16 +84,16 @@ export class ChangeMinter__Params {
   }
 }
 
-export class Gain extends ethereum.Event {
-  get params(): Gain__Params {
-    return new Gain__Params(this);
+export class Donate extends ethereum.Event {
+  get params(): Donate__Params {
+    return new Donate__Params(this);
   }
 }
 
-export class Gain__Params {
-  _event: Gain;
+export class Donate__Params {
+  _event: Donate;
 
-  constructor(event: Gain) {
+  constructor(event: Donate) {
     this._event = event;
   }
 
@@ -107,6 +107,14 @@ export class Gain__Params {
 
   get amount(): BigInt {
     return this._event.parameters[2].value.toBigInt();
+  }
+
+  get twitter(): Bytes {
+    return this._event.parameters[3].value.toBytes();
+  }
+
+  get msg(): string {
+    return this._event.parameters[4].value.toString();
   }
 }
 
@@ -129,6 +137,28 @@ export class OwnershipTransferred__Params {
 
   get newOwner(): Address {
     return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class ProfileSetup extends ethereum.Event {
+  get params(): ProfileSetup__Params {
+    return new ProfileSetup__Params(this);
+  }
+}
+
+export class ProfileSetup__Params {
+  _event: ProfileSetup;
+
+  constructor(event: ProfileSetup) {
+    this._event = event;
+  }
+
+  get tokenId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get username(): string {
+    return this._event.parameters[1].value.toString();
   }
 }
 
@@ -224,28 +254,6 @@ export class UpdateMinDeposit__Params {
   }
 }
 
-export class UpdateProfile extends ethereum.Event {
-  get params(): UpdateProfile__Params {
-    return new UpdateProfile__Params(this);
-  }
-}
-
-export class UpdateProfile__Params {
-  _event: UpdateProfile;
-
-  constructor(event: UpdateProfile) {
-    this._event = event;
-  }
-
-  get tokenId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get url(): string {
-    return this._event.parameters[1].value.toString();
-  }
-}
-
 export class Withdraw extends ethereum.Event {
   get params(): Withdraw__Params {
     return new Withdraw__Params(this);
@@ -294,6 +302,44 @@ export class ProfileBuyMeAMeal extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  bytes32ToString(_bytes32: Bytes): string {
+    let result = super.call(
+      "bytes32ToString",
+      "bytes32ToString(bytes32):(string)",
+      [ethereum.Value.fromFixedBytes(_bytes32)]
+    );
+
+    return result[0].toString();
+  }
+
+  try_bytes32ToString(_bytes32: Bytes): ethereum.CallResult<string> {
+    let result = super.tryCall(
+      "bytes32ToString",
+      "bytes32ToString(bytes32):(string)",
+      [ethereum.Value.fromFixedBytes(_bytes32)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  contractURI(): string {
+    let result = super.call("contractURI", "contractURI():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_contractURI(): ethereum.CallResult<string> {
+    let result = super.tryCall("contractURI", "contractURI():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
   }
 
   getApproved(tokenId: BigInt): Address {
@@ -371,6 +417,25 @@ export class ProfileBuyMeAMeal extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  multicall(data: Array<Bytes>): Array<Bytes> {
+    let result = super.call("multicall", "multicall(bytes[]):(bytes[])", [
+      ethereum.Value.fromBytesArray(data)
+    ]);
+
+    return result[0].toBytesArray();
+  }
+
+  try_multicall(data: Array<Bytes>): ethereum.CallResult<Array<Bytes>> {
+    let result = super.tryCall("multicall", "multicall(bytes[]):(bytes[])", [
+      ethereum.Value.fromBytesArray(data)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytesArray());
   }
 
   name(): string {
@@ -460,18 +525,22 @@ export class ProfileBuyMeAMeal extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  tokenID(_username: Bytes): BigInt {
-    let result = super.call("tokenID", "tokenID(bytes32):(uint256)", [
-      ethereum.Value.fromFixedBytes(_username)
-    ]);
+  tokenIdToBalance(param0: BigInt): BigInt {
+    let result = super.call(
+      "tokenIdToBalance",
+      "tokenIdToBalance(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
 
     return result[0].toBigInt();
   }
 
-  try_tokenID(_username: Bytes): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("tokenID", "tokenID(bytes32):(uint256)", [
-      ethereum.Value.fromFixedBytes(_username)
-    ]);
+  try_tokenIdToBalance(param0: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "tokenIdToBalance",
+      "tokenIdToBalance(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -479,18 +548,45 @@ export class ProfileBuyMeAMeal extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  tokenTVL(tokenId: BigInt): BigInt {
-    let result = super.call("tokenTVL", "tokenTVL(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    ]);
+  tokenIdUsername(param0: BigInt): Bytes {
+    let result = super.call(
+      "tokenIdUsername",
+      "tokenIdUsername(uint256):(bytes32)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_tokenIdUsername(param0: BigInt): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "tokenIdUsername",
+      "tokenIdUsername(uint256):(bytes32)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  tokenTotalGain(param0: BigInt): BigInt {
+    let result = super.call(
+      "tokenTotalGain",
+      "tokenTotalGain(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
 
     return result[0].toBigInt();
   }
 
-  try_tokenTVL(tokenId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("tokenTVL", "tokenTVL(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    ]);
+  try_tokenTotalGain(param0: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "tokenTotalGain",
+      "tokenTotalGain(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -515,6 +611,29 @@ export class ProfileBuyMeAMeal extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  usernameToTokenId(param0: Bytes): BigInt {
+    let result = super.call(
+      "usernameToTokenId",
+      "usernameToTokenId(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_usernameToTokenId(param0: Bytes): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "usernameToTokenId",
+      "usernameToTokenId(bytes32):(uint256)",
+      [ethereum.Value.fromFixedBytes(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 }
 
@@ -599,8 +718,12 @@ export class BuyMealCall__Inputs {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get value1(): Bytes {
+  get _from(): Bytes {
     return this._call.inputValues[1].value.toBytes();
+  }
+
+  get _msg(): string {
+    return this._call.inputValues[2].value.toString();
   }
 }
 
@@ -609,6 +732,40 @@ export class BuyMealCall__Outputs {
 
   constructor(call: BuyMealCall) {
     this._call = call;
+  }
+}
+
+export class MulticallCall extends ethereum.Call {
+  get inputs(): MulticallCall__Inputs {
+    return new MulticallCall__Inputs(this);
+  }
+
+  get outputs(): MulticallCall__Outputs {
+    return new MulticallCall__Outputs(this);
+  }
+}
+
+export class MulticallCall__Inputs {
+  _call: MulticallCall;
+
+  constructor(call: MulticallCall) {
+    this._call = call;
+  }
+
+  get data(): Array<Bytes> {
+    return this._call.inputValues[0].value.toBytesArray();
+  }
+}
+
+export class MulticallCall__Outputs {
+  _call: MulticallCall;
+
+  constructor(call: MulticallCall) {
+    this._call = call;
+  }
+
+  get results(): Array<Bytes> {
+    return this._call.outputValues[0].value.toBytesArray();
   }
 }
 
@@ -659,8 +816,8 @@ export class SafeMintCall__Inputs {
     return this._call.inputValues[0].value.toBytes();
   }
 
-  get uri(): string {
-    return this._call.inputValues[1].value.toString();
+  get to(): Address {
+    return this._call.inputValues[1].value.toAddress();
   }
 
   get _signature(): Bytes {
@@ -896,6 +1053,36 @@ export class UpdateCall__Outputs {
   }
 }
 
+export class UpdateContractURICall extends ethereum.Call {
+  get inputs(): UpdateContractURICall__Inputs {
+    return new UpdateContractURICall__Inputs(this);
+  }
+
+  get outputs(): UpdateContractURICall__Outputs {
+    return new UpdateContractURICall__Outputs(this);
+  }
+}
+
+export class UpdateContractURICall__Inputs {
+  _call: UpdateContractURICall;
+
+  constructor(call: UpdateContractURICall) {
+    this._call = call;
+  }
+
+  get _contractURI(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+}
+
+export class UpdateContractURICall__Outputs {
+  _call: UpdateContractURICall;
+
+  constructor(call: UpdateContractURICall) {
+    this._call = call;
+  }
+}
+
 export class UpdateMinDepositCall extends ethereum.Call {
   get inputs(): UpdateMinDepositCall__Inputs {
     return new UpdateMinDepositCall__Inputs(this);
@@ -952,40 +1139,6 @@ export class UpdateMinterCall__Outputs {
   _call: UpdateMinterCall;
 
   constructor(call: UpdateMinterCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateProfileCall extends ethereum.Call {
-  get inputs(): UpdateProfileCall__Inputs {
-    return new UpdateProfileCall__Inputs(this);
-  }
-
-  get outputs(): UpdateProfileCall__Outputs {
-    return new UpdateProfileCall__Outputs(this);
-  }
-}
-
-export class UpdateProfileCall__Inputs {
-  _call: UpdateProfileCall;
-
-  constructor(call: UpdateProfileCall) {
-    this._call = call;
-  }
-
-  get tokenId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get ipfsUrl(): string {
-    return this._call.inputValues[1].value.toString();
-  }
-}
-
-export class UpdateProfileCall__Outputs {
-  _call: UpdateProfileCall;
-
-  constructor(call: UpdateProfileCall) {
     this._call = call;
   }
 }
