@@ -14,7 +14,7 @@ import {
   UpdateMinDeposit,
   Withdraw
 } from "../generated/ProfileBuyMeAMeal/ProfileBuyMeAMeal"
-import { ProfileEntity } from "../generated/schema"
+import { ProfileEntity, User } from "../generated/schema"
 
 
 export function handleTransfer(event: TransferEvent): void {
@@ -31,10 +31,25 @@ export function handleTransfer(event: TransferEvent): void {
     entity.avatar = '';
     entity.backgroundimg = '';
     entity.bio = '';
+
+    entity.creator = event.params.to.toHexString();
+    entity.createdAtTimestamp = event.block.timestamp;
   }
-  entity.owner = event.params.to.toHexString();
+  // let nameToProfile = NameToProfileId.load(entity.username);
+  // if (!nameToProfile) {
+  //   nameToProfile = new NameToProfileId(entity.username);
+  //   nameToProfile.id = event.params.tokenId.toString();
+  //   nameToProfile.save();
+  // }
+  entity.owner = event.params.to.toHex();
   entity.save();
+  let user = User.load(event.params.to.toHexString());
+  if (!user) {
+    user = new User(event.params.to.toHexString());
+    user.save();
+  }
 }
+
 
 export function handleUpdate(event: Update): void {
   let entity = ProfileEntity.load(event.params.tokenId.toString());
@@ -52,6 +67,7 @@ export function handleUpdate(event: Update): void {
     } else if(event.params.key == 'bio') {
       entity.bio = event.params.data;
     }
+    entity.save();
   }
 }
 
