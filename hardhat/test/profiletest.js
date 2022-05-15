@@ -29,15 +29,10 @@ describe("ProfileNFT", function() {
     await profileNFT.safeMint(username, 'url', signature);
 
     await expect(profileNFT.safeMint(username, 'url', signature)).to.be.reverted;
-      /*
-    expect(await greeter.greet()).to.equal("Hello, world!");
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
-    
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
-
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    console.log(await profileNFT.tokenURI(1));
+    /*
+    lets manually check url to speed up dev :D
     */
   });
 });
