@@ -11,6 +11,8 @@
   });
 
   async function changeNetwork() {
+    const CHAIN_ID = 80001;
+    const HEXCHAIN_ID = "0x"+CHAIN_ID.toString(16);
     try {
       await window.ethereum.request({
         method: "wallet_addEthereumChain",
@@ -23,11 +25,20 @@
               symbol: "MATIC",
               decimals: 18,
             },
-            rpcUrls: ["https://rpc-mumbai.matic.today"],
-            blockExplorerUrls: ["	https://mumbai.polygonscan.com/"],
+            rpcUrls: [
+              "https://rpc-mumbai.matic.today/", 
+              "https://matic-mumbai.chainstacklabs.com",
+              "https://rpc-mumbai.maticvigil.com/",
+              "https://matic-testnet-archive-rpc.bwarelabs.com/"
+            ],
+            blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
           }]
       });
+      setTimeout(() => {
+        document.location.reload();
+      }, 10)
     } catch (e) {
+      console.log(e)
       alert("Please manually change your network to Mumbai testnet")
     }
   }
@@ -67,7 +78,7 @@
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm bg-indigo-600 hover:bg-indigo-700"
-          on:click={ changeNetwork }}>
+          on:click={ changeNetwork }>
             Change network
           </button>
         </div>

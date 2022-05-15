@@ -12,7 +12,7 @@ import slugify from 'slugify';
 export const post = async ({ request, locals }) => {
 	const form = await request.formData();
 
-	const slug = slugify(form.get('text'), '_').toLocaleLowerCase();
+	const slug = slugify(form.get('username'), '_').toLocaleLowerCase();
 	if (slug.length > 32) {
 		return {
 			body: {
@@ -28,12 +28,15 @@ export const post = async ({ request, locals }) => {
 	}
 
 
-	const username = ethers.utils.formatBytes32String("eugenioclrc");
+	const username = ethers.utils.formatBytes32String(slug);
+	const userAddress = form.get('userAddress');
 
 	// 66 byte string, which represents 32 bytes of data
 	let messageHash = ethers.utils.solidityKeccak256 (
-									['address', 'bytes32', 'string'],
-									['0x4C0407dA3274217214b7De79F6EB982095969A0e', username, 'url']);
+		['address', 'address', 'bytes32'],
+		// [profileNFT.address, userAddress, username]
+		['0x4C0407dA3274217214b7De79F6EB982095969A0e', userAddress, username]
+	);
 
 	// 32 bytes of data in Uint8Array
 	let messageHashBinary = ethers.utils.arrayify(messageHash);
@@ -47,7 +50,7 @@ export const post = async ({ request, locals }) => {
 	return {
 		body: {
 			signature,
-			slug: slugify(form.get('text'), '_').toLocaleLowerCase(),
+			slug,
 			username,
 		}
 	}
