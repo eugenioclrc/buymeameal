@@ -10,6 +10,28 @@
     init();
   });
 
+  async function changeNetwork() {
+    try {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: HEXCHAIN_ID,
+            chainName: "Mumbai testnet",
+            nativeCurrency: {
+              name: "Matic",
+              symbol: "MATIC",
+              decimals: 18,
+            },
+            rpcUrls: ["https://rpc-mumbai.matic.today"],
+            blockExplorerUrls: ["	https://mumbai.polygonscan.com/"],
+          }]
+      });
+    } catch (e) {
+      alert("Please manually change your network to Mumbai testnet")
+    }
+  }
+
 
 </script>
 
@@ -37,7 +59,7 @@
               </h3>
               <div class="mt-2">
                 <p class="text-sm text-gray-500">
-                  You are in a wrong network, please connect to the <b>Polygon</b> mainnet.
+                  You are in a wrong network, please connect to the <b>Mumbai</b> testnet.
                 </p>
               </div>
             </div>
@@ -45,7 +67,7 @@
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm bg-indigo-600 hover:bg-indigo-700"
-          on:click={() => { /* changeNetwork */ }}>
+          on:click={ changeNetwork }}>
             Change network
           </button>
         </div>
