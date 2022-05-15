@@ -33,7 +33,7 @@ export const post = async ({ request, locals }) => {
 	// 66 byte string, which represents 32 bytes of data
 	let messageHash = ethers.utils.solidityKeccak256 (
 									['address', 'bytes32', 'string'],
-									['0x7EcB084799D232254295cA3ceC16e722b4282678', username, 'url']);
+									['0x4C0407dA3274217214b7De79F6EB982095969A0e', username, 'url']);
 
 	// 32 bytes of data in Uint8Array
 	let messageHashBinary = ethers.utils.arrayify(messageHash);
