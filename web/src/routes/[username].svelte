@@ -8,35 +8,47 @@
     url: 'https://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal',
   });
 
-  /** @type {import('@sveltejs/kit').Load} */
-  export async function load({
-    params
-  }) {
-    console.log(params.username)
-
-    const GET_MYPROFILE = `
+  function fetchData(username) {
+      const GET_MYPROFILE = `
     query ($username: String!) {
       profileEntities(where: { username: $username}) {
         id
         username
         avatar
         color
-        textColor
         backgroundimg
         bio
+        totalSupporters,
+        supporters(last: 5) {
+          amount
+          author
+          message
+          createdAtTimestamp
+          supporter
+        }
         owner {
           id
         }
       }
     }`;
 
-    try {
-      const result = await client
+      return client
         .query(GET_MYPROFILE, {
-          username: slugify(params.username).toLocaleLowerCase()
+          username
         })
         .toPromise();
 
+  }
+  
+
+  /** @type {import('@sveltejs/kit').Load} */
+  export async function load({
+    params
+  }) {
+    try {
+      const username = slugify(params.username).toLocaleLowerCase()
+      const result = await fetchData(username);
+      console.log(result)
       if (!result.data || !result.data.profileEntities.length) {
         return {
           status: 404,
@@ -60,7 +72,36 @@
 </script>
 
 <script>
+  import { ethers } from 'ethers';
+  import {
+    onConnect,
+    onDisconnect
+  } from '$lib/web3';
+  import {
+    connected,
+    signerAddress,
+    contracts
+  } from 'svelte-ethers-store'
+  
+
   export let user = {};
+
+  let from = ''
+  let message = '';
+
+  let amount = 1;
+
+  let pendingTx = false;
+  async function support() {
+    pendingTx = true;
+    const tx = await $contracts.ProfileBMAM.buyMeal(user.id, ethers.utils.formatBytes32String(from), message, { value: ethers.utils.parseEther(String(amount)) });
+    await tx.wait(0);
+    pendingTx = false;
+    const result = await fetchData(user.username);
+    user = result.data.profileEntities[0];
+  }
+
+
 </script>
 
 
@@ -132,7 +173,7 @@ fill="#000000" stroke="none">
                 </a>
               </h1>
             </div>
-            <div class="">0 supporters</div>
+            <div class="">{user.totalSupporters} supporters</div>
           </div>
         </div>
       </div>
@@ -141,23 +182,68 @@ fill="#000000" stroke="none">
   </div>
 </div>
 <div class="mx-auto max-w-6xl px-4 sm:px-6 xl:max-w-5xl xl:px-0 flex flex-col md:flex-row">
-  <div class="w-full md:w-2/3 border rounded bg-white p-2 m-2">
+  <div class="w-full md:w-2/3 border rounded bg-white p-2 m-2 break-all">
     {JSON.stringify(user)}
 
   </div>
-  <div class="w-full md:w-1/3 border rounded bg-white px-6 py-2 flex flex-col">
-    <div class="text-2xl text-center">
-      Buy <span class="font-bold">{user.username}</span> a meal<br />
-    </div>
-    <div class="rounded border border-red-300 bg-red-100 flex flex-row py-4 px-5 my-4 place-items-center">
-      <img alt="Workflow" class="h-12 w-12 rounded-full" src="/logo.png">
-      <span class="ml-4">X</span>
-      <div class="flex flex-row justify-between">
-        <button class="rounded-full border border-red-300 hover:border-red-500 text-red-500 bg-white h-9 w-9 ml-1 text-center font-bold">1</button>
-        <button class="rounded-full border border-red-300 hover:border-red-500 text-red-500 bg-white h-9 w-9 ml-1 text-center font-bold">3</button>
-        <button class="rounded-full border border-red-300 hover:border-red-500 text-red-500 bg-white h-9 w-9 ml-1 text-center font-bold">5</button>
+  <div class="w-full md:w-1/3">
+    <div class=" border rounded bg-white px-6 py-2 flex flex-col">
+      <div class="text-2xl text-center">
+        Buy <span class="font-bold">{user.username}</span> a meal<br />
       </div>
+      <div class="rounded border border-red-300 bg-red-100 flex flex-row py-8 px-5 my-4 place-items-center justify-between" class:opacity-40={!$connected}>
+        <img alt="Workflow" class="h-12 w-12 rounded-full" src="/logo.png">
+        <span class="">X</span>
+        <div class="flex flex-row justify-between">
+          <button disabled={!$connected} class="rounded-full border border-red-300 hover:border-red-500 bg-white h-9 w-9 ml-1 text-center font-bold"
+            class:bg-red-500={amount == 1}
+            class:text-red-500={amount != 1}
+            class:text-white={amount == 1}
+            on:click={() => amount = 1 }>1</button>
+          <button disabled={!$connected} class="rounded-full border border-red-300 hover:border-red-500 bg-white h-9 w-9 ml-1 text-center font-bold"
+            class:bg-red-500={amount == 3}
+            class:text-red-500={amount != 3}
+            class:text-white={amount == 3}
+            on:click={() => amount = 3 }>3</button>
+          <button disabled={!$connected} class="rounded-full border border-red-300 hover:border-red-500 bg-white h-9 w-9 ml-1 text-center font-bold"
+            class:bg-red-500={amount == 5}
+            class:text-red-500={amount != 5}
+            class:text-white={amount == 5}
+            on:click={() => amount = 5 }>5</button>
+        </div>
+        <input type="number" bind:value={amount} disabled={!$connected} class="border border-gray-300 rounded bg-white w-9 h-9 text-center focus:outline-hidden outline-none" />
+      </div>
+      <input type="name" bind:value={from} disabled={!$connected} class="border-gray-300 p-1 border bg-gray-100 rounded mb-1" placeholder="Name or @twitter" />
+      <textarea type="name" bind:value={message} disabled={!$connected} class="border-gray-300 p-1 border bg-gray-100 rounded" placeholder="Message"></textarea>
+      {#if !$connected}
+      <button type="button"
+      class="inline-block px-2 py-2.5 bg-blue-600 text-white font-medium leading-tight rounded-xl mt-2 text-lg uppercase  shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+      on:click={onConnect}>
+        Connect to donate
+      </button>
+      {:else}
+        <button type="button" disabled={!$connected} on:click={support} class="inline-block px-2 py-2.5 bg-red-600 text-white font-medium leading-tight rounded-xl mt-2 text-lg uppercase  shadow-md hover:bg-red-700 hover:shadow-lg focus:bg-red-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-800 active:shadow-lg transition duration-150 ease-in-out">
+          Support
+          with {amount} MATIC
+        </button>
+      {/if}
 
+    {#if $connected}
+      <div class="text-center mt-2">
+        Current Wallet:
+        <b>{$signerAddress.slice(0,6)}...{$signerAddress.slice(-6)}</b>
+        <button on:click={onDisconnect} class="hover:underline">Disconnect</button> 
+      </div>
+    {/if}
     </div>
+    {#if user.supporters.length}
+      <h3>Supporters</h3>
+      {#each user.supporters as s}
+        <div class=" border rounded bg-white px-6 py-2 flex flex-col break-words  ">
+          {JSON.stringify(s)}
+        </div>
+      {/each}
+    {/if}
   </div>
+
 </div>

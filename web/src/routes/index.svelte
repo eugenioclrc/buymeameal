@@ -28,6 +28,7 @@ Subscriptions (WS): wss://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal
     operationStore,
     query
   } from '@urql/svelte';
+import { ethers } from 'ethers';
 
   initClient({
     url: 'https://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal',
@@ -41,6 +42,7 @@ Subscriptions (WS): wss://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal
         tokens {
           id
           username
+          totalSupporters
           balance
           totalGain
         }
@@ -61,6 +63,19 @@ Subscriptions (WS): wss://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal
     }`);
 
   query(GET_PROFILE);
+
+
+  const PROFILES = operationStore(`
+    query {
+      profileEntities(first: 5) {
+        id
+        username
+        totalSupporters
+        avatar
+      }  
+    }`);
+
+  query(PROFILES);
 
 
   let usernameTaken = false;
@@ -109,15 +124,6 @@ Subscriptions (WS): wss://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal
   /*
   $GET_PROFILE.
 
-  {#if $GET_PROFILE.fetching}
-  <p>Loading...</p>
-  {:else if $GET_PROFILE.error}
-  <p>Oh no... {$GET_PROFILE.error.message}</p>
-  {:else}
-  <ul>
-    {JSON.stringify($GET_PROFILE.data.profileEntities.length)}
-  </ul>
-  {/if}
   */
 </script>
 
@@ -215,12 +221,14 @@ Subscriptions (WS): wss://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal
                                   /buymeameal/<span class="font-bold btext-blueGray-600">{t.username}</span>
                                 </a>
                               </th>
-                              <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">{t.balance || 0}</td>
                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {t.totalGain || 0}
+                                {ethers.utils.formatEther(t.balance || '0', 6)}
                               </td>
                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                0
+                                {ethers.utils.formatEther(t.totalGain || '0', 6)}
+                              </td>
+                              <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                {t.totalSupporters || 0}
                               </td>
                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
                                   <button type="button" class="inline-block px-2 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out mr-1">View</button>
@@ -261,82 +269,34 @@ Subscriptions (WS): wss://api.thegraph.com/subgraphs/name/eugenioclrc/buymeameal
           </div>
         </div>
         <div class="flex flex-wrap justify-between">
-    <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white m-2 w-[200px]">
-      <div class="w-200 h-200 overflow-hidden">
-        <img width="200" height="200" src="https://cdn.buymeacoffee.com/uploads/profile_pictures/2020/11/348df2c9ac273b642918f634ac2d2086.jpg@300w_0e.jpg" alt="name" class="scale-200 w-[200px] h-[200px] object-cover transform hover:scale-105 duration-300">
-      </div>
-      
-      <div class="px-6 py-4">
-        <div class="font-bold text-xl mb-2">Mountain</div>
-        <div class="text-sm text-black font-regular mt-1 leading-19 flex">
-                   <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1 mt-0.5"><path d="M8.98699 15.4375L7.90109 14.449C4.04429 10.9516 1.49805 8.64505 1.49805 5.81423C1.49805 3.50764 3.31037 1.69531 5.61697 1.69531C6.92004 1.69531 8.17069 2.30192 8.98699 3.2605C9.80328 2.30192 11.0539 1.69531 12.357 1.69531C14.6636 1.69531 16.4759 3.50764 16.4759 5.81423C16.4759 8.64505 13.9297 10.9516 10.0729 14.4565L8.98699 15.4375Z" stroke="black" stroke-width="1.49779"></path></svg>
-                    301 Supporters
-    </div>
-        
-      </div>
-      
-    </div>
-    <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white m-2 w-[200px]">
-      <div class="w-200 h-200 overflow-hidden">
-        <img width="200" height="200" src="https://cdn.buymeacoffee.com/uploads/profile_pictures/2020/11/348df2c9ac273b642918f634ac2d2086.jpg@300w_0e.jpg" alt="name" class="scale-200 w-[200px] h-[200px] object-cover transform hover:scale-105 duration-300">
-      </div>
-      
-      <div class="px-6 py-4">
-        <div class="font-bold text-xl mb-2">Mountain</div>
-        <div class="text-sm text-black font-regular mt-1 leading-19 flex">
-                   <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1 mt-0.5"><path d="M8.98699 15.4375L7.90109 14.449C4.04429 10.9516 1.49805 8.64505 1.49805 5.81423C1.49805 3.50764 3.31037 1.69531 5.61697 1.69531C6.92004 1.69531 8.17069 2.30192 8.98699 3.2605C9.80328 2.30192 11.0539 1.69531 12.357 1.69531C14.6636 1.69531 16.4759 3.50764 16.4759 5.81423C16.4759 8.64505 13.9297 10.9516 10.0729 14.4565L8.98699 15.4375Z" stroke="black" stroke-width="1.49779"></path></svg>
-                    301 Supporters
-    </div>
-        
-      </div>
-      
-    </div>
-    <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white m-2 w-[200px]">
-      <div class="w-200 h-200 overflow-hidden">
-        <img width="200" height="200" src="https://cdn.buymeacoffee.com/uploads/profile_pictures/2020/11/348df2c9ac273b642918f634ac2d2086.jpg@300w_0e.jpg" alt="name" class="scale-200 w-[200px] h-[200px] object-cover transform hover:scale-105 duration-300">
-      </div>
-      
-      <div class="px-6 py-4">
-        <div class="font-bold text-xl mb-2">Mountain</div>
-        <div class="text-sm text-black font-regular mt-1 leading-19 flex">
-                   <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1 mt-0.5"><path d="M8.98699 15.4375L7.90109 14.449C4.04429 10.9516 1.49805 8.64505 1.49805 5.81423C1.49805 3.50764 3.31037 1.69531 5.61697 1.69531C6.92004 1.69531 8.17069 2.30192 8.98699 3.2605C9.80328 2.30192 11.0539 1.69531 12.357 1.69531C14.6636 1.69531 16.4759 3.50764 16.4759 5.81423C16.4759 8.64505 13.9297 10.9516 10.0729 14.4565L8.98699 15.4375Z" stroke="black" stroke-width="1.49779"></path></svg>
-                    301 Supporters
-    </div>
-        
-      </div>
-      
-    </div>
-      <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white m-2 w-[200px]">
-      <div class="w-200 h-200 overflow-hidden">
-        <img width="200" height="200" src="https://cdn.buymeacoffee.com/uploads/profile_pictures/2020/11/348df2c9ac273b642918f634ac2d2086.jpg@300w_0e.jpg" alt="name" class="scale-200 w-[200px] h-[200px] object-cover transform hover:scale-105 duration-300">
-      </div>
-      
-      <div class="px-6 py-4">
-        <div class="font-bold text-xl mb-2">Mountain</div>
-        <div class="text-sm text-black font-regular mt-1 leading-19 flex">
-                   <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1 mt-0.5"><path d="M8.98699 15.4375L7.90109 14.449C4.04429 10.9516 1.49805 8.64505 1.49805 5.81423C1.49805 3.50764 3.31037 1.69531 5.61697 1.69531C6.92004 1.69531 8.17069 2.30192 8.98699 3.2605C9.80328 2.30192 11.0539 1.69531 12.357 1.69531C14.6636 1.69531 16.4759 3.50764 16.4759 5.81423C16.4759 8.64505 13.9297 10.9516 10.0729 14.4565L8.98699 15.4375Z" stroke="black" stroke-width="1.49779"></path></svg>
-                    301 Supporters
-    </div>
-        
-      </div>
-      
-    </div>
-      <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white m-2 w-[200px]">
-      <div class="w-200 h-200 overflow-hidden">
-        <img width="200" height="200" src="https://cdn.buymeacoffee.com/uploads/profile_pictures/2020/11/348df2c9ac273b642918f634ac2d2086.jpg@300w_0e.jpg" alt="name" class="scale-200 w-[200px] h-[200px] object-cover transform hover:scale-105 duration-300">
-      </div>
-      
-      <div class="px-6 py-4">
-        <div class="font-bold text-xl mb-2">Mountain</div>
-        <div class="text-sm text-black font-regular mt-1 leading-19 flex">
-                   <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1 mt-0.5"><path d="M8.98699 15.4375L7.90109 14.449C4.04429 10.9516 1.49805 8.64505 1.49805 5.81423C1.49805 3.50764 3.31037 1.69531 5.61697 1.69531C6.92004 1.69531 8.17069 2.30192 8.98699 3.2605C9.80328 2.30192 11.0539 1.69531 12.357 1.69531C14.6636 1.69531 16.4759 3.50764 16.4759 5.81423C16.4759 8.64505 13.9297 10.9516 10.0729 14.4565L8.98699 15.4375Z" stroke="black" stroke-width="1.49779"></path></svg>
-                    301 Supporters
-    </div>
-        
-      </div>
-      
-    </div>
 
+
+            {#if $PROFILES.fetching}
+  <p>Loading...</p>
+  {:else if $PROFILES.error}
+  <p>Oh no... {$PROFILES.error.message}</p>
+  {:else}
+    {#each $PROFILES.data.profileEntities as p}
+      <div class="max-w-sm rounded overflow-hidden shadow-lg bg-white m-2 w-[200px]">
+        <div class="w-200 h-200 overflow-hidden">
+          <a href={'/'+p.username}>
+            <img width="200" height="200" src="#dsa" alt="name" class="scale-200 w-[200px] h-[200px] object-cover transform hover:scale-105 duration-300 bg-slate-400">
+          </a>
+        </div>
+        
+        <div class="px-6 py-4">
+          <div class="font-bold text-xl mb-2">
+            <a href={'/'+p.username}>{p.username}</a>
+          </div>
+          <div class="text-sm text-black font-regular mt-1 leading-19 flex">
+            <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1 mt-0.5"><path d="M8.98699 15.4375L7.90109 14.449C4.04429 10.9516 1.49805 8.64505 1.49805 5.81423C1.49805 3.50764 3.31037 1.69531 5.61697 1.69531C6.92004 1.69531 8.17069 2.30192 8.98699 3.2605C9.80328 2.30192 11.0539 1.69531 12.357 1.69531C14.6636 1.69531 16.4759 3.50764 16.4759 5.81423C16.4759 8.64505 13.9297 10.9516 10.0729 14.4565L8.98699 15.4375Z" stroke="black" stroke-width="1.49779"></path></svg>
+                      {p.totalSupporters} Supporters
+          </div>        
+        </div>
+      </div>
+    {/each}
+  {/if}
+      
         </div>
 
        
