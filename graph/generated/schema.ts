@@ -188,6 +188,15 @@ export class ProfileEntity extends Entity {
   set supporters(value: Array<string>) {
     this.set("supporters", Value.fromStringArray(value));
   }
+
+  get totalSupporters(): BigInt {
+    let value = this.get("totalSupporters");
+    return value!.toBigInt();
+  }
+
+  set totalSupporters(value: BigInt) {
+    this.set("totalSupporters", Value.fromBigInt(value));
+  }
 }
 
 export class Support extends Entity {

@@ -28,6 +28,7 @@ export function handleTransfer(event: TransferEvent): void {
     entity.avatar = '';
     entity.backgroundimg = '';
     entity.bio = '';
+    entity.totalSupporters = BigInt.zero();
 
     entity.creator = event.params.to.toHexString();
     entity.createdAtTimestamp = event.block.timestamp;
@@ -54,6 +55,13 @@ export function handleDonate(event: Donate): void {
   if(!support) {
     support = new Support(event.params.tokenId.toString()+'-'+event.transaction.hash.toHexString());
   }
+
+  let entity = ProfileEntity.load(event.params.tokenId.toString());
+  if(entity) {
+    entity.totalSupporters += BigInt.fromString("1");
+    entity.save();
+  }
+  
   support.profile = event.params.tokenId.toString();
   support.createdAtTimestamp = event.block.timestamp;
   support.supporter = event.transaction.from.toHexString();
