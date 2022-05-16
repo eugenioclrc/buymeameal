@@ -162,6 +162,8 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
 export function handleProfileSetup(event: ProfileSetup): void {}
 
+export function handleUpdateMinDeposit(event: UpdateMinDeposit): void {}
+
 export function handleTotalGain(event: TotalGain): void {
   let entity = ProfileEntity.load(event.params.tokenId.toString());
   if (entity) {
