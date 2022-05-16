@@ -14,19 +14,16 @@ import {
   UpdateMinDeposit,
   Withdraw
 } from "../generated/ProfileBuyMeAMeal/ProfileBuyMeAMeal"
-import { ProfileEntity, User } from "../generated/schema"
+import { ProfileEntity, User, Support } from "../generated/schema"
 
 
 export function handleTransfer(event: TransferEvent): void {
-  
-
   let entity = ProfileEntity.load(event.params.tokenId.toString());
   if (!entity) {
     entity = new ProfileEntity(event.transaction.from.toHex())
     entity.id = event.params.tokenId.toString()
     let contract = ProfileBuyMeAMealContract.bind(event.address);
     entity.color = '001219';
-    entity.textColor = 'FFFFFF';
     entity.username = contract.bytes32ToString(contract.tokenIdUsername(event.params.tokenId));
     entity.avatar = '';
     entity.backgroundimg = '';
@@ -51,13 +48,27 @@ export function handleTransfer(event: TransferEvent): void {
 }
 
 
+export function handleDonate(event: Donate): void {
+  let contract = ProfileBuyMeAMealContract.bind(event.address);
+  let support = Support.load(event.params.tokenId.toString()+'-'+event.transaction.hash.toHexString());
+  if(!support) {
+    support = new Support(event.params.tokenId.toString()+'-'+event.transaction.hash.toHexString());
+  }
+  support.profile = event.params.tokenId.toString();
+  support.createdAtTimestamp = event.block.timestamp;
+  support.supporter = event.transaction.from.toHexString();
+  support.author = contract.bytes32ToString(event.params.twitter);
+  support.message = event.params.msg;
+  support.amount = event.transaction.value;
+  support.save();
+}
+
+
 export function handleUpdate(event: Update): void {
   let entity = ProfileEntity.load(event.params.tokenId.toString());
   if (entity) {
     if(event.params.key == 'color') {
       entity.color = event.params.data;
-    } else if(event.params.key == 'textColor') {
-      entity.textColor = event.params.data;
     } else if(event.params.key == 'username') {
       entity.username = event.params.data;
     } else if(event.params.key == 'avatar') {
@@ -133,9 +144,6 @@ export function handleApproval(event: Approval): void {
 */
 export function handleApprovalForAll(event: ApprovalForAll): void {}
 
-export function handleChangeMinter(event: ChangeMinter): void {}
-
-export function handleDonate(event: Donate): void {}
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 

@@ -85,23 +85,6 @@ export class ProfileEntity extends Entity {
     }
   }
 
-  get textColor(): string | null {
-    let value = this.get("textColor");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set textColor(value: string | null) {
-    if (!value) {
-      this.unset("textColor");
-    } else {
-      this.set("textColor", Value.fromString(<string>value));
-    }
-  }
-
   get backgroundimg(): string | null {
     let value = this.get("backgroundimg");
     if (!value || value.kind == ValueKind.NULL) {
@@ -195,6 +178,125 @@ export class ProfileEntity extends Entity {
     } else {
       this.set("totalGain", Value.fromBigInt(<BigInt>value));
     }
+  }
+
+  get supporters(): Array<string> {
+    let value = this.get("supporters");
+    return value!.toStringArray();
+  }
+
+  set supporters(value: Array<string>) {
+    this.set("supporters", Value.fromStringArray(value));
+  }
+}
+
+export class Support extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Support entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Support must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Support", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Support | null {
+    return changetype<Support | null>(store.get("Support", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get profile(): string {
+    let value = this.get("profile");
+    return value!.toString();
+  }
+
+  set profile(value: string) {
+    this.set("profile", Value.fromString(value));
+  }
+
+  get createdAtTimestamp(): BigInt {
+    let value = this.get("createdAtTimestamp");
+    return value!.toBigInt();
+  }
+
+  set createdAtTimestamp(value: BigInt) {
+    this.set("createdAtTimestamp", Value.fromBigInt(value));
+  }
+
+  get supporter(): string | null {
+    let value = this.get("supporter");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set supporter(value: string | null) {
+    if (!value) {
+      this.unset("supporter");
+    } else {
+      this.set("supporter", Value.fromString(<string>value));
+    }
+  }
+
+  get author(): string | null {
+    let value = this.get("author");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set author(value: string | null) {
+    if (!value) {
+      this.unset("author");
+    } else {
+      this.set("author", Value.fromString(<string>value));
+    }
+  }
+
+  get message(): string | null {
+    let value = this.get("message");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set message(value: string | null) {
+    if (!value) {
+      this.unset("message");
+    } else {
+      this.set("message", Value.fromString(<string>value));
+    }
+  }
+
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value!.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
   }
 }
 

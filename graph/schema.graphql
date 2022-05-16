@@ -10,7 +10,19 @@ type ProfileEntity @entity {
   owner: User!
   balance: BigInt
   totalGain: BigInt
+  supporters: [Support!]! @derivedFrom(field: "profile")
 }
+
+type Support @entity {
+  id: ID!
+  profile: ProfileEntity!
+  createdAtTimestamp: BigInt!
+  supporter: String
+  author: String
+  message: String
+  amount: BigInt!
+}
+
 
 type User @entity {
   id: ID!
