@@ -8,7 +8,7 @@ dataSources:
     source:
       address: "0x4C0407dA3274217214b7De79F6EB982095969A0e"
       abi: ProfileBuyMeAMeal
-      startBlock: 26325954
+      startBlock: 26325950
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

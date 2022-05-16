@@ -101,7 +101,18 @@
     user = result.data.profileEntities[0];
   }
 
-
+  
+  let priceMatic;
+  $: if($contracts && $contracts.chainlinkMaticUSD) {
+    try {
+      $contracts.chainlinkMaticUSD.latestRoundData().then((response) => {
+        priceMatic = response.answeredInRound;
+      });
+    } catch(e) {
+      console.log(e)
+    }
+  }
+    
 </script>
 
 
@@ -226,6 +237,9 @@ fill="#000000" stroke="none">
           Support
           with {amount} MATIC
         </button>
+        {#if priceMatic}
+          Total: {(parseFloat(ethers.utils.formatEther(priceMatic)) * amount).toFixed(2)} USD
+        {/if}
       {/if}
 
     {#if $connected}

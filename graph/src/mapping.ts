@@ -29,8 +29,8 @@ export function handleTransfer(event: TransferEvent): void {
     entity.backgroundimg = '';
     entity.bio = '';
     entity.totalSupporters = BigInt.zero();
-    entity.balance = BigInt.zero();
-    entity.totalGain = BigInt.zero();
+    entity.balance = contract.tokenIdToBalance(event.params.tokenId);
+    entity.totalGain = contract.tokenTotalGain(event.params.tokenId);
 
     entity.creator = event.params.to.toHexString();
     entity.createdAtTimestamp = event.block.timestamp;
@@ -61,8 +61,8 @@ export function handleDonate(event: Donate): void {
   let entity = ProfileEntity.load(event.params.tokenId.toString());
   if(entity) {
     entity.totalSupporters += BigInt.fromString("1");
-    entity.balance += event.transaction.value;
-    entity.totalGain += event.transaction.value;
+    entity.balance = contract.tokenIdToBalance(event.params.tokenId);
+    entity.totalGain = contract.tokenTotalGain(event.params.tokenId);
 
     entity.save();
   }
@@ -166,6 +166,7 @@ export function handleTotalGain(event: TotalGain): void {
   let entity = ProfileEntity.load(event.params.tokenId.toString());
   if (entity) {
     let contract = ProfileBuyMeAMealContract.bind(event.address);
+    entity.balance = contract.tokenIdToBalance(event.params.tokenId);
     entity.totalGain = contract.tokenTotalGain(event.params.tokenId);
     entity.save();
   }
