@@ -29,6 +29,8 @@ export function handleTransfer(event: TransferEvent): void {
     entity.backgroundimg = '';
     entity.bio = '';
     entity.totalSupporters = BigInt.zero();
+    entity.balance = BigInt.zero();
+    entity.totalGain = BigInt.zero();
 
     entity.creator = event.params.to.toHexString();
     entity.createdAtTimestamp = event.block.timestamp;
@@ -59,6 +61,9 @@ export function handleDonate(event: Donate): void {
   let entity = ProfileEntity.load(event.params.tokenId.toString());
   if(entity) {
     entity.totalSupporters += BigInt.fromString("1");
+    entity.balance += event.transaction.value;
+    entity.totalGain += event.transaction.value;
+
     entity.save();
   }
   
@@ -165,8 +170,6 @@ export function handleTotalGain(event: TotalGain): void {
     entity.save();
   }
 }
-
-export function handleUpdateMinDeposit(event: UpdateMinDeposit): void {}
 
 export function handleWithdraw(event: Withdraw): void {
   let entity = ProfileEntity.load(event.params.tokenId.toString());

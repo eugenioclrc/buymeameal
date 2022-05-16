@@ -8,8 +8,8 @@ type ProfileEntity @entity {
   createdAtTimestamp: BigInt!
   creator: User!
   owner: User!
-  balance: BigInt
-  totalGain: BigInt
+  balance: BigInt!
+  totalGain: BigInt!
   supporters: [Support!]! @derivedFrom(field: "profile")
   totalSupporters: BigInt!
 }

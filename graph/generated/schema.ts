@@ -146,38 +146,22 @@ export class ProfileEntity extends Entity {
     this.set("owner", Value.fromString(value));
   }
 
-  get balance(): BigInt | null {
+  get balance(): BigInt {
     let value = this.get("balance");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set balance(value: BigInt | null) {
-    if (!value) {
-      this.unset("balance");
-    } else {
-      this.set("balance", Value.fromBigInt(<BigInt>value));
-    }
+  set balance(value: BigInt) {
+    this.set("balance", Value.fromBigInt(value));
   }
 
-  get totalGain(): BigInt | null {
+  get totalGain(): BigInt {
     let value = this.get("totalGain");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set totalGain(value: BigInt | null) {
-    if (!value) {
-      this.unset("totalGain");
-    } else {
-      this.set("totalGain", Value.fromBigInt(<BigInt>value));
-    }
+  set totalGain(value: BigInt) {
+    this.set("totalGain", Value.fromBigInt(value));
   }
 
   get supporters(): Array<string> {
