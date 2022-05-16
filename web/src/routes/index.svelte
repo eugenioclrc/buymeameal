@@ -216,24 +216,28 @@ import { ethers } from 'ethers';
                           {#each $GET_MYPROFILE.data.user.tokens as t}
                             <tr>
                               <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left pl-3 font-normal">
-                                <a href="#">
+                                <a href="/{t.username}">
                                   <!-- <img src="/notus-svelte/assets/img/bootstrap.jpg" class="h-12 w-12 bg-white rounded-full border" alt="..."> -->
                                   /buymeameal/<span class="font-bold btext-blueGray-600">{t.username}</span>
                                 </a>
                               </th>
                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {ethers.utils.formatEther(t.balance || '0', 6)}
+                                {ethers.utils.formatEther(t.balance||'0' , 6)}
                               </td>
                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {ethers.utils.formatEther(t.totalGain || '0', 6)}
+                                {ethers.utils.formatEther(t.totalGain ||'0', 6)}
                               </td>
                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                 {t.totalSupporters || 0}
                               </td>
                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-right">
-                                  <button type="button" class="inline-block px-2 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out mr-1">View</button>
+                                  <a class="inline-block px-2 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out mr-1"
+                                  href="/{t.username}">View</a>
                                   <button type="button" class="inline-block px-2 py-2.5 bg-purple-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-purple-700 hover:shadow-lg focus:bg-purple-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-purple-800 active:shadow-lg transition duration-150 ease-in-out">Edit</button>
-                                  <button type="button" class="inline-block px-2 py-2.5 bg-green-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg transition duration-150 ease-in-out">Harvest</button>
+                                  <button type="button" class="inline-block px-2 py-2.5 bg-green-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg transition duration-150 ease-in-out"
+                                    disabled={ethers.utils.formatEther(t.balance ||'0') == '0.0'}
+                                    class:opacity-40={ethers.utils.formatEther(t.balance ||'0') == '0.0'}
+                                  >Harvest</button>
                               </td>
                             </tr>
                           {/each}
