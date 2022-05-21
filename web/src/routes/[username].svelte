@@ -1,4 +1,6 @@
 <script context="module">
+  export const prerender = true;
+
   import {
     createClient
   } from '@urql/core';
